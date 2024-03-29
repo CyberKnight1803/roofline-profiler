@@ -1,0 +1,22 @@
+import os 
+
+# PATHS
+PATH_DATASET = os.environ.get("PATH_DATASET", "./data/imagenette2-160")
+
+# HARDWARE 
+NUM_WORKERS = 4
+
+# HYPERPARAMS 
+GLOBAL_SEED = 42
+MAX_EPOCHS = 1
+BATCH_SIZE = 64
+LEARNING_RATE = 3e-5
+
+DEFAULT_MODEL = 'small'
+ALLOWED_MODELS = ['small', 'medium', 'large']
+
+DEFAULT_ACCELERATOR = 'cuda'
+
+START_ITR = 10
+STOP_ITR = 12
+
