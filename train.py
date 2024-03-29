@@ -11,8 +11,7 @@ from torchvision.transforms import transforms as T
 from torchvision.datasets import ImageFolder
 
 from torchsummary import summary
-from fvcore.nn import FlopCountAnalysis, flop_count_table, ActivationCountAnalysis
-# import nvidia_dlprof_pytorch_nvtx 
+import nvidia_dlprof_pytorch_nvtx 
 
 from models import SModel, MModel, LModel
 from config import (
@@ -61,11 +60,11 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
 
     for epoch in tqdm(range(epochs)):
         for batch_idx, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
-            # with torch.autograd.profiler.emit_nvtx():
+            with torch.autograd.profiler.emit_nvtx():
                 
                 # Start Profiler
-                # if iterations == start_itr:
-                    # profiler.start()
+                if iterations == start_itr:
+                    profiler.start()
 
                 # Get data 
                 data, target = batch 
@@ -87,8 +86,8 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
                 optimizer.step()
 
                 # Stop Profiler
-                # if iterations == stop_itr:
-                    # profiler.stop()
+                if iterations == stop_itr:
+                    profiler.stop()
 
                 iterations += 1
 
@@ -110,7 +109,7 @@ if __name__ == "__main__":
     device = torch.device(args.accelerator if torch.cuda.is_available() else "cpu")
 
     # DLProf
-    # nvidia_dlprof_pytorch_nvtx.init(enable_function_stack=True)
+    nvidia_dlprof_pytorch_nvtx.init(enable_function_stack=True)
 
     if args.model == 'small':
         model = SModel()
@@ -132,13 +131,6 @@ if __name__ == "__main__":
         device=device,
         col_names=['output_size', 'num_params', 'mult_adds']
     )
-
-    # FLOPS Analysis 
-    flops = FlopCountAnalysis(model, torch.ones((1, 3, 160, 160)))
-    print(flop_count_table(flops))
-
-    activation_flops = ActivationCountAnalysis(model, torch.ones((1, 3, 160, 160)))
-    print(f"Activation FLOPS: {activation_flops.total()}")
 
     # Dataloader
     dataloader = create_dataloader(batch_size=args.batch_size)
