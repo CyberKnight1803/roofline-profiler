@@ -42,7 +42,7 @@ def create_dataloader(data_dir: str = PATH_DATASET, batch_size: int = BATCH_SIZE
     )
 
 
-def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device):
+def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device, exp_name):
 
     # Model in train mode
     model.train() 
@@ -54,7 +54,7 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
     criterion = nn.CrossEntropyLoss()
 
     profiler = torch.profiler.profile(
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./tensor-logs/resnet18'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./tensor-logs/{exp_name}'),
         profile_memory=True,
         with_flops=True,
         use_cuda=True
@@ -86,6 +86,7 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--exp', type=str, required=True, help='Set experiment name')
     parser.add_argument('--model', type=str, default=DEFAULT_MODEL, help="Model to use")
     parser.add_argument("--accelerator", type=str, default=DEFAULT_ACCELERATOR, help="Set accelerator")
     parser.add_argument("--epochs", type=int, default=MAX_EPOCHS, help="Set epochs")
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     dataloader = create_dataloader(batch_size=args.batch_size)
 
     # Train Model
-    profiler = train(model, dataloader, args.epochs, args.lr, args.start_itr, args.stop_itr, device)
+    profiler = train(model, dataloader, args.epochs, args.lr, args.start_itr, args.stop_itr, device, args.exp)
 
     # Profiler stats
     print(profiler.key_averages().table())
