@@ -53,36 +53,34 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
     # Loss function
     criterion = nn.CrossEntropyLoss()
 
+    profiler = torch.profiler.profile(
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./tensor-logs/resnet18'),
+        profile_memory=True,
+        with_flops=True,
+        use_cuda=True
+    ) 
+
     iterations = 0
     for epoch in tqdm(range(epochs)):
         for batch_idx, batch in tqdm(enumerate(dataloader), total=len(dataloader)):                
             # Start Profiler
-            if iterations >= start_itr and iterations < stop_itr:
-                
-                with torch.autograd.profiler.profile(
-                    enabled=True,
-                    with_flops=True,
-                    profile_memory=True,
-                    use_cuda=True,
-                ) as profiler:
-                    data, target = batch 
-                    data, target = data.to(device), target.to(device)
-                    optimizer.zero_grad()
-                    output = model(data)
-                    loss = criterion(output, target)
-                    loss.backward()
-                    optimizer.step()
+            if iterations == start_itr:
+                profiler.start()
             
-            else:
-                data, target = batch 
-                data, target = data.to(device), target.to(device)
-                optimizer.zero_grad()
-                output = model(data)
-                loss = criterion(output, target)
-                loss.backward()
-                optimizer.step()
+            data, target = batch 
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            output = model(data)
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
+
+            if iterations == stop_itr:
+                profiler.stop()
 
             iterations += 1
+    
+    return profiler
 
 
 if __name__ == "__main__":
@@ -126,5 +124,7 @@ if __name__ == "__main__":
     dataloader = create_dataloader(batch_size=args.batch_size)
 
     # Train Model
-    train(model, dataloader, args.epochs, args.lr, args.start_itr, args.stop_itr, device)
+    profiler = train(model, dataloader, args.epochs, args.lr, args.start_itr, args.stop_itr, device)
 
+    # Profiler stats
+    print(profiler.key_averages().table())
