@@ -1,7 +1,6 @@
 import torch 
 import torch.nn as nn 
 import torch.nn.functional as F 
-import torch.autograd.profiler as profiler
 
 class SModel(nn.Module):
     def __init__(self):
@@ -24,21 +23,21 @@ class SModel(nn.Module):
         self.relu = nn.ReLU()
     
     def forward(self, x):
-        with profiler.record_function("CONV_BLOCK_1"):
+        with torch.profiler.record_function("CONV_BLOCK_1"):
             # CONV_BLOCK_1
             out = self.conv1(x)
             out = self.batchnorm1(out)
             out = self.relu(out)
             out = self.maxpool1(out)
 
-        with profiler.record_function("CONV_BLOCK_2"):
+        with torch.profiler.record_function("CONV_BLOCK_2"):
             # CONV_BLOCK_2
             out = self.conv2(out)
             out = self.batchnorm2(out)
             out = self.relu(out)
             out = self.maxpool2(out)
 
-        with profiler.record_function("MLP_LAYER"):
+        with torch.profiler.record_function("MLP_LAYER"):
             # MLP_LAYER
             out = self.flatten(out)
             out = self.fc1(out)
@@ -69,21 +68,21 @@ class MModel(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x):
-        with profiler.record_function("CONV_BLOCK_1"):
+        with torch.profiler.record_function("CONV_BLOCK_1"):
             # CONV_BLOCK_1
             out = self.conv1(x)
             out = self.batchnorm1(out)
             out = F.relu(out)
             out = self.maxpool1(out)
 
-        with profiler.record_function("CONV_BLOCK_2"):
+        with torch.profiler.record_function("CONV_BLOCK_2"):
             # CONV_BLOCK_2
             out = self.conv2(out)
             out = self.batchnorm2(out)
             out = F.relu(out)
             out = self.maxpool2(out)
 
-        with profiler.record_function("MLP_LAYER"):
+        with torch.profiler.record_function("MLP_LAYER"):
             # MLP_LAYER
             out = self.flatten(out)
             out = self.fc1(out)
@@ -119,21 +118,21 @@ class LModel(nn.Module):
 
     def forward(self, x):
 
-        with profiler.record_function("CONV_BLOCK_1"):
+        with torch.profiler.record_function("CONV_BLOCK_1"):
             # CONV_BLOCK_1
             out = self.conv1(x)
             out = self.batchnorm1(out)
             out = F.relu(out)
             out = self.maxpool1(out)
 
-        with profiler.record_function("CONV_BLOCK_2"):
+        with torch.profiler.record_function("CONV_BLOCK_2"):
             # CONV_BLOCK_2
             out = self.conv2(out)
             out = self.batchnorm2(out)
             out = F.relu(out)
             out = self.maxpool2(out)
 
-        with profiler.record_function("MLP_LAYER"):
+        with torch.profiler.record_function("MLP_LAYER"):
             # MLP_LAYER
             out = self.flatten(out)
             out = self.fc1(out)

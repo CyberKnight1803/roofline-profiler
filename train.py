@@ -67,23 +67,25 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
                     profiler.start()
 
                 # Get data 
-                data, target = batch 
-                data, target = data.to(device), target.to(device)
+                with torch.profiler.record_function("Data Loading"):
+                    data, target = batch 
+                    data, target = data.to(device), target.to(device)
 
                 # Zero grad 
                 optimizer.zero_grad()
 
                 # Forward pass
-                output = model(data)
+                with torch.profiler.record_function("Forward Pass")
+                    output = model(data)
 
                 # Loss
-                loss = criterion(output, target)
+                with torch.profiler.record_function("Loss Calculation"):
+                    loss = criterion(output, target)
 
                 # Backward pass
-                loss.backward()
-                
-                # Optimize
-                optimizer.step()
+                with torch.profiler.record_function("Backward Pass"):
+                    loss.backward()
+                    optimizer.step()
 
                 # Stop Profiler
                 if iterations == stop_itr:
