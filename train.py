@@ -75,7 +75,7 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
                 optimizer.zero_grad()
 
                 # Forward pass
-                with torch.profiler.record_function("Forward Pass")
+                with torch.profiler.record_function("Forward Pass"):
                     output = model(data)
 
                 # Loss

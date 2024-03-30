@@ -65,17 +65,26 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device,
     iterations = 0
     for epoch in tqdm(range(epochs)):
         for batch_idx, batch in tqdm(enumerate(dataloader), total=len(dataloader)):                
-            # Start Profiler
+            
+            # Start Profiler       
             if iterations == start_itr:
                 profiler.start()
-            
-            data, target = batch 
-            data, target = data.to(device), target.to(device)
+
+            with torch.profiler.record_function("Data Loading"):
+                data, target = batch 
+                data, target = data.to(device), target.to(device)
+
             optimizer.zero_grad()
-            output = model(data)
-            loss = criterion(output, target)
-            loss.backward()
-            optimizer.step()
+
+            with torch.profiler.record_function("Forward Pass"):
+                output = model(data)
+            
+            with torch.profiler.record_function("Loss Calculation"):
+                loss = criterion(output, target)
+            
+            with torch.profiler.record_function("Backward Pass"):
+                loss.backward()
+                optimizer.step()
 
             if iterations == stop_itr:
                 profiler.stop()
