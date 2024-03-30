@@ -57,6 +57,7 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device,
         on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./tensor-logs/{exp_name}'),
         profile_memory=True,
         with_flops=True,
+        with_stack=True,
         activities=[
             torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA
         ]
