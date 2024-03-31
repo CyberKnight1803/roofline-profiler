@@ -9,6 +9,7 @@ from torchvision.transforms import transforms as T
 from torchvision.datasets import ImageFolder
 
 from torchsummary import summary
+from calflops import calculate_flops
 
 from models import SModel, MModel, LModel
 from config import (
@@ -132,6 +133,13 @@ if __name__ == "__main__":
         device=device,
         col_names=['output_size', 'num_params', 'mult_adds']
     )
+
+    # FLOPs: One Iteration
+    input_shape = (256, 3, 160, 160)
+    flops, macs, params = calculate_flops(model=model, 
+                                      input_shape=input_shape,
+                                      output_as_string=True,
+                                      output_precision=4)
 
     # Dataloader
     dataloader = create_dataloader(batch_size=args.batch_size)
