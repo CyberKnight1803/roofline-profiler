@@ -11,7 +11,7 @@ from torchvision.transforms import transforms as T
 from torchvision.datasets import ImageFolder
 
 from torchsummary import summary
-import nvidia_dlprof_pytorch_nvtx 
+# import nvidia_dlprof_pytorch_nvtx 
 
 from models import SModel, MModel, LModel
 from config import (
@@ -67,25 +67,24 @@ def train(model, dataloader, epochs, learning_rate, start_itr, stop_itr, device)
                     profiler.start()
 
                 # Get data 
-                with torch.profiler.record_function("Data Loading"):
-                    data, target = batch 
-                    data, target = data.to(device), target.to(device)
+                
+                data, target = batch 
+                data, target = data.to(device), target.to(device)
 
                 # Zero grad 
                 optimizer.zero_grad()
 
                 # Forward pass
-                with torch.profiler.record_function("Forward Pass"):
-                    output = model(data)
+                
+                output = model(data)
 
                 # Loss
-                with torch.profiler.record_function("Loss Calculation"):
-                    loss = criterion(output, target)
+               
+                loss = criterion(output, target)
 
                 # Backward pass
-                with torch.profiler.record_function("Backward Pass"):
-                    loss.backward()
-                    optimizer.step()
+                loss.backward()
+                optimizer.step()
 
                 # Stop Profiler
                 if iterations == stop_itr:
@@ -111,7 +110,7 @@ if __name__ == "__main__":
     device = torch.device(args.accelerator if torch.cuda.is_available() else "cpu")
 
     # DLProf
-    nvidia_dlprof_pytorch_nvtx.init(enable_function_stack=True)
+    # nvidia_dlprof_pytorch_nvtx.init(enable_function_stack=True)
 
     if args.model == 'small':
         model = SModel()
