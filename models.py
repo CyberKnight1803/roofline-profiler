@@ -1,6 +1,7 @@
 import torch 
 import torch.nn as nn 
 import torch.nn.functional as F 
+from torchvision import models
 
 class SModel(nn.Module):
     def __init__(self):
@@ -145,3 +146,53 @@ class LModel(nn.Module):
 
         return out
 
+
+class Model(nn.Module):
+    ALLOWED_MODELS = [
+        'resnet', 'alexnet', 'googlenet'
+    ]
+
+    def __init__(
+        self, 
+        model_name: str  = 'resnet',
+    ) -> None:
+        
+        super().__init__()
+
+        self.model_name = model_name
+        layers = []
+        if self.model_name == 'resnet':
+            self.model = models.resnet34()
+        
+        elif self.model_name == 'alexnet': 
+            self.model = models.alexnet()
+        
+        elif self.model_name == 'googlenet':
+            self.model = models.googlenet()
+
+        else: 
+            assert self.model_name not in self.ALLOWED_MODELS, f"{self.model}"
+
+        # All models have 1000 nodes in the output layer because of original ImageNet dataset
+        # Need to add more fc layers to make it to 10 for ImageNette dataset
+
+        self.mlp_layer = nn.Sequential(
+            nn.ReLU(),
+            nn.Linear(1000, 512),
+            nn.ReLU(), 
+            nn.Linear(512, 64), 
+            nn.ReLU(), 
+            nn.Linear(64, 10)
+        )
+    
+    def forward(self, x):
+        # torch.cuda.nvtx.range_push(f'layer:{self.model_name}')
+        outs = self.model(x)
+
+
+        # torch.cuda.nvtx.range_push(f'layer:mlp_layer')
+        outs = self.mlp_layer(outs)
+
+        # torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
+        return outs

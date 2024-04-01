@@ -13,7 +13,7 @@ from torchvision.datasets import ImageFolder
 from torchsummary import summary
 # import nvidia_dlprof_pytorch_nvtx 
 
-from models import SModel, MModel, LModel
+from models import SModel, MModel, LModel, Model
 from config import (
     DEFAULT_ACCELERATOR,
     DEFAULT_MODEL, 
@@ -120,7 +120,16 @@ if __name__ == "__main__":
 
     elif args.model == 'large':
         model = LModel()
+
+    elif args.model == 'resnet':
+        model = Model(model_name='resnet')
     
+    elif args.model == 'alexnet':
+        model = Model(model_name='alexnet')
+
+    elif args.model == 'googlenet':
+        model = Model(model_name='googlenet')
+
     else:
         assert args.model in ALLOWED_MODELS, f"Model: {args.model} not allowed. Choose from {ALLOWED_MODELS}"
 
@@ -132,6 +141,9 @@ if __name__ == "__main__":
         device=device,
         col_names=['output_size', 'num_params', 'mult_adds']
     )
+
+    import sys 
+    sys.exit()
 
     # Dataloader
     dataloader = create_dataloader(batch_size=args.batch_size)
