@@ -187,11 +187,13 @@ class Model(nn.Module):
     
     def forward(self, x):
         # torch.cuda.nvtx.range_push(f'layer:{self.model_name}')
-        outs = self.model(x)
+        with torch.profiler.record_function(f"{self.model_name}"):
+            outs = self.model(x)
 
 
         # torch.cuda.nvtx.range_push(f'layer:mlp_layer')
-        outs = self.mlp_layer(outs)
+        with torch.profiler.record_function("MLP_LAYER"):
+            outs = self.mlp_layer(outs)
 
         # torch.cuda.nvtx.range_pop()
         # torch.cuda.nvtx.range_pop()
