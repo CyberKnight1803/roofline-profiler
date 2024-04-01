@@ -142,9 +142,6 @@ if __name__ == "__main__":
         col_names=['output_size', 'num_params', 'mult_adds']
     )
 
-    import sys 
-    sys.exit()
-
     # Dataloader
     dataloader = create_dataloader(batch_size=args.batch_size)
 

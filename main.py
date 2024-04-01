@@ -143,9 +143,6 @@ if __name__ == "__main__":
         col_names=['output_size', 'num_params', 'mult_adds']
     )
 
-    import sys 
-    sys.exit()
-
     # FLOPs: One Iteration
     input_shape = (256, 3, 160, 160)
     flops, macs, params = calculate_flops(model=model, 

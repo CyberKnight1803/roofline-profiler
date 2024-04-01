@@ -157,10 +157,9 @@ class Model(nn.Module):
         model_name: str  = 'resnet',
     ) -> None:
         
-        super().__init__()
+        super(Model, self).__init__()
 
         self.model_name = model_name
-        layers = []
         if self.model_name == 'resnet':
             self.model = models.resnet34()
         
